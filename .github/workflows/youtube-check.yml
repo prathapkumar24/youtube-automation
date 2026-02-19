@@ -1,0 +1,23 @@
+name: Check YouTube uploads
+
+on:
+  schedule:
+    - cron: "*/15 * * * *"   # every 15 minutes
+  workflow_dispatch:
+
+jobs:
+  check-youtube:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check latest YouTube video
+        env:
+          API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+          CHANNEL_ID: ${{ secrets.YOUTUBE_CHANNEL_ID }}
+        run: |
+          curl -s \
+          "https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${CHANNEL_ID}&order=date&maxResults=1&type=video&key=${API_KEY}" \
+          > response.json
+
+          echo "Latest video:"
+          cat response.json
