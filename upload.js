@@ -60,6 +60,7 @@ async function downloadVideo(videoId) {
   await ytdlp.download(url, {
     output: outputFile,
     format: "mp4",
+    cookies: "cookies.txt",
   });
 
   // Mark as uploaded
