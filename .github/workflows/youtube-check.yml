@@ -43,8 +43,8 @@ jobs:
       - name: Check cookies permissions
         run: ls -l cookies.txt
 
-      - name: Run yt-dlp with debug
-        run: yt-dlp -v --cookies cookies.txt https://www.youtube.com/watch?v=STIeqTKgyYs
+      #- name: Run yt-dlp with debug
+      #  run: yt-dlp -v --cookies cookies.txt https://www.youtube.com/watch?v=STIeqTKgyYs
       
       - name: Make cookies read-only
         run: chmod 444 cookies.txt
