@@ -46,8 +46,8 @@ jobs:
       #- name: Run yt-dlp with debug
       #  run: yt-dlp -v --cookies cookies.txt https://www.youtube.com/watch?v=STIeqTKgyYs
       
-      - name: Make cookies read-only
-        run: chmod 444 cookies.txt
+      #- name: Make cookies read-only
+      #  run: chmod 444 cookies.txt
 
       - name: Upload latest YouTube video to Facebook
         env:
