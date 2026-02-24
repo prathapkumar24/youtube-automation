@@ -55,8 +55,28 @@ async function downloadVideo(videoId) {
   }
   const ytdlp = new YtDlp();
   const url = `https://www.youtube.com/watch?v=${videoId}`;
-  const outputFile = path.resolve(`video-${videoId}.mp4`);
   
+  const outputFile = path.resolve(`video-${videoId}.mp4`);
+  /*const options = {
+      cookies: process.env.COOKIE_PATH || './cookies.txt',
+      noCacheDir: true,
+      verbose: true,              // Enables yt-dlp internal debug logs
+      debugPrintCommandLine: true // Shows the exact command being run
+  };
+  try {
+    const info = await ytdlp.getInfoAsync(url, options);
+      console.log("Success!");
+  } catch (err) {
+      console.error("Debug Error:", err);
+  }
+  const cookiesPath = "./cookies.txt";
+
+  const cookies = fs.readFileSync(cookiesPath, "utf8");
+  console.log("===== cookies.txt =====");
+  console.log(cookies);
+  console.log("=======================");
+  return;
+  */
   const options = {
       cookies: process.env.COOKIE_PATH || './cookies.txt',
       format: "mp4",
@@ -65,7 +85,7 @@ async function downloadVideo(videoId) {
       verbose: true,              // Enables yt-dlp internal debug logs
       debugPrintCommandLine: true // Shows the exact command being run
   };
-  await ytdlp.download(url, options);
+  await ytdlp.downloadAsync(url, options);
 
   // Mark as uploaded
   await markAsUploaded(videoId);  
