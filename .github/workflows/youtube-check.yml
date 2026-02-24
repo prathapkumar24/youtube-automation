@@ -21,19 +21,34 @@ jobs:
       - name: Install dependencies
         run: |
           npm install node-fetch@3 ytdlp-nodejs form-data
+
+      - name: Install yt-dlp
+        run: |
+          python3 -m pip install --upgrade pip
+          pip install yt-dlp
+
+      - name: Verify yt-dlp
+        run: yt-dlp --version
+        
       - name: Create cookies file
         run: |
           echo "${{ secrets.YTDLP_COOKIES }}" > cookies.txt
+
       - name: Make cookies read-only
         run: chmod 444 cookies.txt
+
       - name: Check cookies file size
         run: ls -lh cookies.txt
+
       - name: Check cookies line count
         run: wc -l cookies.txt
+
       - name: Check cookies permissions
         run: ls -l cookies.txt
+
       - name: Run yt-dlp with debug
         run: yt-dlp -v --cookies cookies.txt https://www.youtube.com/watch?v=STIeqTKgyYs
+
       - name: Upload latest YouTube video to Facebook
         env:
           YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
