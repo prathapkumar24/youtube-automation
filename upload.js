@@ -54,6 +54,13 @@ async function downloadVideo(videoId) {
     console.log(`Video ${videoId} already uploaded. Skipping...`);
     process.exit(0); // stop script
   }
+  const cookiesPath = "./cookies.txt";
+
+  const cookies = fs.readFileSync(cookiesPath, "utf8");
+  console.log("===== cookies.txt =====");
+  console.log(cookies);
+  console.log("=======================");
+
   const ytdlp = new YtDlp();
   const url = `https://www.youtube.com/watch?v=${videoId}`;
   
