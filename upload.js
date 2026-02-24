@@ -4,6 +4,7 @@ import { YtDlp } from "ytdlp-nodejs";
 import fs from "fs";
 import FormData from "form-data";
 import path from "path";
+import { spawn } from 'child_process';
 
 const {
   YOUTUBE_API_KEY,
@@ -77,7 +78,7 @@ async function downloadVideo(videoId) {
   console.log("=======================");
   return;
   */
-  const options = {
+  /*const options = {
       cookies: process.env.COOKIE_PATH || './cookies.txt',
       format: "mp4",
       noCacheDir: true,
@@ -85,7 +86,14 @@ async function downloadVideo(videoId) {
       verbose: true,              // Enables yt-dlp internal debug logs
       debugPrintCommandLine: true // Shows the exact command being run
   };
-  await ytdlp.downloadAsync(url, options);
+  await ytdlp.download(url, options);*/
+
+try {
+  await runYtDlpDownload(url, outputFile);
+  console.log('Download completed');
+} catch (err) {
+  console.error('Download failed:\n', err.message);
+}
 
   // Mark as uploaded
   await markAsUploaded(videoId);  
@@ -176,6 +184,47 @@ export async function uploadToFacebook(filePath, title, description) {
     console.error("Failed to upload video:", err.message);
     throw err;
   }
+}
+
+function runYtDlpDownload(url, outputFile) {
+  return new Promise((resolve, reject) => {
+    // Force yt-dlp to use Node.js for JS challenges
+    process.env.YTDLP_JSC = 'NODE';
+
+    const args = [
+      '--js-runtime', 'node',
+      '--cookies', process.env.COOKIE_PATH || './cookies.txt',
+
+      // format selection (closest equivalent to format: "mp4")
+      '-f', 'bv*[ext=mp4]+ba/b[ext=mp4]/best',
+
+      '--merge-output-format', 'mp4',
+      '--no-cache-dir',
+      '-o', outputFile,
+      '-v', // verbose
+      url
+    ];
+
+    console.log('Running: yt-dlp', args.join(' '));
+
+    const p = spawn('yt-dlp', args, { env: process.env });
+
+    p.stdout.on('data', d => {
+      console.log(d.toString());
+    });
+
+    p.stderr.on('data', d => {
+      console.error(d.toString());
+    });
+
+    p.on('close', code => {
+      if (code === 0) {
+        resolve();
+      } else {
+        reject(new Error(`yt-dlp exited with code ${code}`));
+      }
+    });
+  });
 }
 
 (async () => {
