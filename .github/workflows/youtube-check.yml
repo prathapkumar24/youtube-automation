@@ -1,7 +1,7 @@
 name: YouTube to Facebook Upload
 
 on:
- schedule:
+  schedule:
     - cron: "4 * * * *" # every 30 minutes
   workflow_dispatch:
 
