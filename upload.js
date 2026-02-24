@@ -1,7 +1,6 @@
 //import "dotenv/config";
 import fetch from "node-fetch";
 import { YtDlp } from "ytdlp-nodejs";
-//import ytdl  from "ytdl-core";
 import fs from "fs";
 import FormData from "form-data";
 import path from "path";
@@ -69,6 +68,12 @@ async function downloadVideo(videoId) {
   } catch (err) {
       console.error("Debug Error:", err);
   }
+  const cookiesPath = "./cookies.txt";
+
+  const cookies = fs.readFileSync(cookiesPath, "utf8");
+  console.log("===== cookies.txt =====");
+  console.log(cookies);
+  console.log("=======================");
   return;
   await ytdlp.download(url, {
     output: outputFile,
