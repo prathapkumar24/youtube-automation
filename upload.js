@@ -235,6 +235,6 @@ function runYtDlpDownload(url, outputFile) {
   const description = video.snippet.description;
 
   const file = await downloadVideo(videoId);
-  //await uploadToFacebook(file, title, description);
-  //await deleteVideo(videoId);
+  await uploadToFacebook(file, title, description);
+  await deleteVideo(videoId);
 })();
