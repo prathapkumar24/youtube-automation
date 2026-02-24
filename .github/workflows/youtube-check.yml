@@ -24,11 +24,14 @@ jobs:
       - name: Create cookies file
         run: |
           echo "${{ secrets.YTDLP_COOKIES }}" > cookies.txt
+      - name: Make cookies read-only
+        run: chmod 444 cookies.txt
       - name: Upload latest YouTube video to Facebook
         env:
           YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
           YOUTUBE_CHANNEL_ID: ${{ secrets.YOUTUBE_CHANNEL_ID }}
           FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
           FB_PAGE_TOKEN: ${{ secrets.FB_PAGE_TOKEN }}
+          COOKIE_PATH: ./cookies.txt
         run: |
           node upload.js

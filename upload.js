@@ -58,7 +58,8 @@ async function downloadVideo(videoId) {
   const outputFile = path.resolve(`video-${videoId}.mp4`);
   
   const options = {
-      cookies: './cookies.txt',
+      cookies: process.env.COOKIE_PATH || './cookies.txt',
+      noCacheDir: true,
       verbose: true,              // Enables yt-dlp internal debug logs
       debugPrintCommandLine: true // Shows the exact command being run
   };
