@@ -195,20 +195,22 @@ export async function uploadToFacebook(filePath, title, description) {
 
 function runYtDlpDownload(url, outputFile) {
   return new Promise((resolve, reject) => {
-    // Force yt-dlp to use Node.js for JS challenges
     process.env.YTDLP_JSC = 'NODE';
 
     const args = [
       '--js-runtime', 'node',
-      '--cookies', process.env.COOKIE_PATH || './cookies.txt',
 
-      // format selection (closest equivalent to format: "mp4")
-      '-f', 'bv*[ext=mp4]+ba/b[ext=mp4]/best',
+      // 🔑 THIS IS THE CRITICAL FIX
+      '--remote-components', 'ejs:github',
 
-      '--merge-output-format', 'mp4',
+      '--cookies', process.env.COOKIE_PATH || `${process.env.HOME}/cookies.txt`,
       '--no-cache-dir',
+
+      '-f', 'bv*[ext=mp4]+ba/b[ext=mp4]/best',
+      '--merge-output-format', 'mp4',
+
       '-o', outputFile,
-      '-v', // verbose
+      '-v',
       url
     ];
 
@@ -216,20 +218,12 @@ function runYtDlpDownload(url, outputFile) {
 
     const p = spawn('yt-dlp', args, { env: process.env });
 
-    p.stdout.on('data', d => {
-      console.log(d.toString());
-    });
-
-    p.stderr.on('data', d => {
-      console.error(d.toString());
-    });
+    p.stdout.on('data', d => console.log(d.toString()));
+    p.stderr.on('data', d => console.error(d.toString()));
 
     p.on('close', code => {
-      if (code === 0) {
-        resolve();
-      } else {
-        reject(new Error(`yt-dlp exited with code ${code}`));
-      }
+      if (code === 0) resolve();
+      else reject(new Error(`yt-dlp exited with code ${code}`));
     });
   });
 }
