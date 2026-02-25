@@ -1,8 +1,8 @@
-name: YouTube to Facebook Upload
+name: YouTube to Facebook Post
 
 on:
   schedule:
-    - cron: "12 * * * *" # every 30 minutes
+    - cron: "4 * * * *" # every 30 minutes
   workflow_dispatch:
 
 jobs:
@@ -20,41 +20,13 @@ jobs:
 
       - name: Install dependencies
         run: |
-          npm install node-fetch@3 ytdlp-nodejs form-data
+          npm install node-fetch@3
 
-      - name: Install yt-dlp
-        run: |
-          python3 -m pip install --upgrade pip
-          pip install yt-dlp
-
-      - name: Verify yt-dlp
-        run: yt-dlp --version
-
-      - name: Create cookies file
-        run: |
-          echo "${{ secrets.YTDLP_COOKIES }}" > cookies.txt
-
-      - name: Check cookies file size
-        run: ls -lh cookies.txt
-
-      - name: Check cookies line count
-        run: wc -l cookies.txt
-
-      - name: Check cookies permissions
-        run: ls -l cookies.txt
-
-      #- name: Run yt-dlp with debug
-      #  run: yt-dlp -v --cookies cookies.txt https://www.youtube.com/watch?v=STIeqTKgyYs
-      
-      #- name: Make cookies read-only
-      #  run: chmod 444 cookies.txt
-
-      - name: Upload latest YouTube video to Facebook
+      - name: Post Upload latest YouTube video to Facebook
         env:
           YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
           YOUTUBE_CHANNEL_ID: ${{ secrets.YOUTUBE_CHANNEL_ID }}
           FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
           FB_PAGE_TOKEN: ${{ secrets.FB_PAGE_TOKEN }}
-          COOKIE_PATH: ./cookies.txt
         run: |
-          node upload.js
+          node do_post.js

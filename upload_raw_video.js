@@ -1,4 +1,4 @@
-//import "dotenv/config";
+import "dotenv/config";
 import fetch from "node-fetch";
 import { YtDlp } from "ytdlp-nodejs";
 import fs from "fs";
@@ -54,87 +54,25 @@ async function downloadVideo(videoId) {
     console.log(`Video ${videoId} already uploaded. Skipping...`);
     process.exit(0); // stop script
   }
-  const cookiesPath = "./cookies.txt";
-
-  const cookies = fs.readFileSync(cookiesPath, "utf8");
-  console.log("===== cookies.txt =====");
-  console.log(cookies);
-  console.log("=======================");
 
   const ytdlp = new YtDlp();
   const url = `https://www.youtube.com/watch?v=${videoId}`;
   
-  const outputFile = path.resolve(`video-${videoId}.mp4`);
-  /*const options = {
-      cookies: process.env.COOKIE_PATH || './cookies.txt',
-      noCacheDir: true,
-      verbose: true,              // Enables yt-dlp internal debug logs
-      debugPrintCommandLine: true // Shows the exact command being run
-  };
-  try {
-    const info = await ytdlp.getInfoAsync(url, options);
-      console.log("Success!");
-  } catch (err) {
-      console.error("Debug Error:", err);
-  }
-  const cookiesPath = "./cookies.txt";
-
-  const cookies = fs.readFileSync(cookiesPath, "utf8");
-  console.log("===== cookies.txt =====");
-  console.log(cookies);
-  console.log("=======================");
-  return;
-  */
-  /*const options = {
-      cookies: process.env.COOKIE_PATH || './cookies.txt',
-      format: "mp4",
-      noCacheDir: true,
-      output: outputFile,
-      verbose: true,              // Enables yt-dlp internal debug logs
-      debugPrintCommandLine: true // Shows the exact command being run
-  };
-  await ytdlp.download(url, options);*/
+  const outputTemplate = path.resolve(`video-${videoId}.%(ext)s`);
 
 try {
-  await runYtDlpDownload(url, outputFile);
+  await runYtDlpDownload(url, outputTemplate);
   console.log('Download completed');
 } catch (err) {
   console.error('Download failed:\n', err.message);
 }
 
   // Mark as uploaded
+  const finalFile = resolveDownloadedFile(videoId);
+  return finalFile;
   await markAsUploaded(videoId);  
   return outputFile;
-  /*const COOKIE = '__Secure-1PAPISID=Kd4NDthuavsDKvb_/ApjfhpoD_ygFr4U4m; __Secure-1PSID=g.a0006whyUT5QjGclcohR-PDmec9udUL_VJUrgQkK1KmfPhid-5PxL3m83xGlPOJkfEhX9kcDDAACgYKATgSARYSFQHGX2Midv6TVuk2JVHIQ6tXbvYrGRoVAUF8yKoBMwkbzL8cQl8Cg3rthkog0076; __Secure-1PSIDCC=AKEyXzVIrVrJBP7FWRI76VI6rap6DN-TyFBfBIgEcVoP-gEVb_cPk2yNr6_7hGHpJuOEP1CSTiY; __Secure-1PSIDTS=sidts-CjQBBj1CYs9VUXG4gI0SpmAj4g3EEI4jg9U7Pcm0WdTGKnsrlI1DObaS0BuxxsnZ1jCPqdtfEAA; __Secure-3PAPISID=Kd4NDthuavsDKvb_/ApjfhpoD_ygFr4U4m; __Secure-3PSID=g.a0006whyUT5QjGclcohR-PDmec9udUL_VJUrgQkK1KmfPhid-5PxskkIobVLMEAHt-jARectGAACgYKAcMSARYSFQHGX2MiqUJeqHGHY65j_c_9QSTJmxoVAUF8yKpobWjKSGALeKPaNCGtmhOq0076; __Secure-3PSIDCC=AKEyXzUcOsz4HYiXDgqg1eH9GinD_6kymSCYL2jE8kmgHYDCZ1e_Ci20yzVb9U6dddsPhnmkBd0; __Secure-3PSIDTS=sidts-CjQBBj1CYs9VUXG4gI0SpmAj4g3EEI4jg9U7Pcm0WdTGKnsrlI1DObaS0BuxxsnZ1jCPqdtfEAA; __Secure-ROLLOUT_TOKEN=CNTOsIa1jpr0MBDiiNzu-_aKAxj42OWG2PGSAw%3D%3D; __Secure-YNID=16.YT=DvweXKFiAQDCJ55v8szt78slK4YwuvGoy_eRNbi7y0yJSBBPegNbaZqhn6WmNowziUDqRJ18F-EeZXEgpVGXQHnL9x-ym0vz3NcEZEUbUQOODvg5LHIfEdxDukgDMhi8AIk2KNgXcBQf2oNrOd0veAIc4xJT8JVWeMoghf3ttKA2lQBAx9uCIUl9aQ9BzSTf4wEB_kRZhqI2hEA5P7QCEGCQmrwQFuO9aC7bsSckOIAnYijYe8UVkcFloB9RY5LXGVxijEgOgXtCxSIDLWCVXjy24kClDxI3WVbZfNz26ITK9ao_o9uTPBY11WW-WkwsxX82m_3-n-ZHS83vWU3YKw; APISID=jZhs9HPIs1JVNiaw/AvPbB2S468jths_yL; HSID=A0k-GHUxb9cKBBg3Y; LOGIN_INFO=AFmmF2swRAIgMf7rslFZEtXxbLMmZvJDqccvci81fa6GXKdpPIX0l10CIBHWBUeoI0W6r4ITYL_bRZ4wV_6PjwSxtrE6BGXJ-v0p:QUQ3MjNmejhLdjdaMWdueks5ZWJwcDFQRVBqYnhnM0VwV3ZRZEVVajBNSWlXUmYxYlFZZEhjLVBiN3lPaTJuMVozQ2xocU9CUkxyVkpUUGRRbXB5amh0LW5ZTUM0aWJoSWJCMVhEX2oyOGplS1IyamlCLU9zOWxWakYzcFpFV0piQk0wQXZFRHBOYXNqSU8xd3VrWjFQLUpuSFNzUGdRVk1B; PREF=f4=4000000&tz=Asia.Calcutta&f7=100; SAPISID=Kd4NDthuavsDKvb_/ApjfhpoD_ygFr4U4m; SID=g.a0006whyUT5QjGclcohR-PDmec9udUL_VJUrgQkK1KmfPhid-5Pxh5nUa24sU0uyhIzPiFtWuwACgYKARkSARYSFQHGX2MiaH7VxO5SemTRsvkPAKX98RoVAUF8yKqvBGj-ySIQOmMEXR9tItl80076; SIDCC=AKEyXzV1pz3aD9ACsgCiDRDDSXNYrPmmv6gHZbeQr8makX9ijZSknXOuHGUe48HgXO6J1EgeoDc; SSID=Auv13vBfcsAN4bm7l; VISITOR_INFO1_LIVE=yasP3l7YXWk; VISITOR_PRIVACY_METADATA=CgJJThIEGgAgKQ%3D%3D; YSC=B7t4w9klGIg';
-  const outputName = `video-${videoId}.mp4`;
-  const outputPath = path.resolve(outputName);
-  const video = ytdl(videoId, {
-    requestOptions: {
-      headers: {
-        cookie: COOKIE,
-        // Optional. If not given, ytdl-core will try to find it.
-        // You can find this by going to a video's watch page, viewing the source,
-        // and searching for "ID_TOKEN".
-        // 'x-youtube-identity-token': 1324,
-      },
-    },
-  });
-  video.on('info', info => {
-    console.log('title:', info.videoDetails.title);
-    console.log('rating:', info.player_response.videoDetails.averageRating);
-    console.log('uploaded by:', info.videoDetails.author.name);
-  });
 
-  video.on('progress', (chunkLength, downloaded, total) => {
-    const percent = downloaded / total;
-    console.log('downloading', `${(percent * 100).toFixed(1)}%`);
-  });
-
-  video.on('end', () => {
-    console.log('saved to', outputName);
-  });
-
-  video.pipe(fs.createWriteStream(outputPath));*/
 }
 
 // Retry helper
@@ -193,7 +131,7 @@ export async function uploadToFacebook(filePath, title, description) {
   }
 }
 
-function runYtDlpDownload(url, outputFile) {
+function runYtDlpDownload(url, outputTemplate) {
   return new Promise((resolve, reject) => {
     process.env.YTDLP_JSC = 'NODE';
 
@@ -209,7 +147,7 @@ function runYtDlpDownload(url, outputFile) {
       '-f', 'bv*[ext=mp4]+ba/b[ext=mp4]/best',
       '--merge-output-format', 'mp4',
 
-      '-o', outputFile,
+      '-o', outputTemplate,
       '-v',
       url
     ];
@@ -226,6 +164,13 @@ function runYtDlpDownload(url, outputFile) {
       else reject(new Error(`yt-dlp exited with code ${code}`));
     });
   });
+}
+
+function resolveDownloadedFile(videoId) {
+  const files = fs.readdirSync(process.cwd());
+  const match = files.find(f => f.startsWith(`video-${videoId}.`) && f.endsWith('.mp4'));
+  if (!match) throw new Error('Downloaded file not found after yt-dlp run');
+  return path.resolve(match);
 }
 
 (async () => {
