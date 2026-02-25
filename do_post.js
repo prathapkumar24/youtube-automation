@@ -56,17 +56,22 @@ export async function postToFacebook(videoId, title, description) {
   const upload = async () => {
     const video_url = `https://www.youtube.com/watch?v=${videoId}`;
 
+    const body = new URLSearchParams({
+      message: `${title}\n\n${description}`,
+      link: video_url,
+      published: "true",
+      access_token: FB_PAGE_TOKEN,
+    });
+
     // Fix 2: Use graph-video.facebook.com for video uploads
     const res = await fetch(
       `https://graph.facebook.com/v25.0/${FB_PAGE_ID}/feed`,
       {
         method: "POST",
-        message:`${title}\n\n${description}`,
-        link:video_url,
-        published:true,
-        access_token: FB_PAGE_TOKEN,
-        // Note: 'timeout' is not a standard option for native fetch; 
-        // use AbortController if you need a timeout.
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body,
       }
     );
 
