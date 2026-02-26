@@ -2,7 +2,7 @@
   "name": "youtube-automation",
   "version": "1.0.0",
   "description": "",
-  "main": "upload.js",
+  "main": "do_post.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -20,9 +20,6 @@
   "homepage": "https://github.com/prathapkumar24/youtube-automation#readme",
   "dependencies": {
     "dotenv": "^17.3.1",
-    "form-data": "^4.0.5",
-    "formdata-node": "^6.0.3",
-    "node-fetch": "^3.3.2",
-    "ytdlp-nodejs": "^3.4.4"
+    "node-fetch": "^3.3.2"
   }
 }
