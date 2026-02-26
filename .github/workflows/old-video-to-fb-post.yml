@@ -1,5 +1,8 @@
 name: Old YouTube videos to Facebook Post
 
+permissions:
+  contents: write 
+  
 on:
   schedule:
     - cron: "4 */4 * * *" # every 4 Hours 04 minutes
