@@ -59,10 +59,10 @@ export async function postToFacebook(videoId, title, description) {
       message: `${decodedTitle}\n\n${decodedDescription}`,
       link: video_url,
       published: "true",
+      privacy: JSON.stringify({ value: "EVERYONE" }),
       access_token: FB_PAGE_TOKEN,
     });
 
-    // Fix 2: Use graph-video.facebook.com for video uploads
     const res = await fetch(
       `https://graph.facebook.com/v25.0/${FB_PAGE_ID}/feed`,
       {
